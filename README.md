@@ -169,6 +169,17 @@ For detailed API documentation and examples, please refer to the individual algo
 
 If you use this library in your research or use our algorithm, please cite our work:
 
+```bibtex
+@article{zhang2025constrained,
+  title={Constrained Reinforcement Learning with Smoothed Log Barrier Function},
+  author={B. Zhang and Y. Zhang and H. Zhu and S. Yan and T. Brox and J. Boedecker},
+  journal={Transactions on Machine Learning Research},
+  issn={2835-8856},
+  year={2025},
+  url={https://openreview.net/forum?id=Amh95oURaE},
+}
+```
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
