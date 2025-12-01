@@ -211,8 +211,6 @@ def create_env(
         env = SubprocVecEnv([lambda: instantiate_env(env_cfg, seed, norm_act=norm_act, monitor=monitor, save_path=save_path, env_kwargs=env_kwargs) for i in range(num_env)])
     else:
         env = DummyVecEnv([lambda: instantiate_env(env_cfg, seed, norm_act=norm_act, monitor=monitor, save_path=save_path, env_kwargs=env_kwargs) for i in range(num_env)])
-    # env.seed(seed)
-    # _ = env.reset()
     print("All envs created")
     if norm_obs or norm_reward or norm_cost:
         env = ExtendedVecNormalize(
@@ -234,16 +232,6 @@ def instantiate_env(
         monitor: bool = True,
         save_path: str = None,
         env_kwargs: dict = {}):
-    
-    if "NumericalOptimization" in env_cfg.env_name:
-        from saferl.common.envs.numerical_optimization_tasks import numerical_env_alias_dict, create_numerical_optimization_env
-        assert env_kwargs["env_type"] in numerical_env_alias_dict.keys(), f"env_type {env_kwargs['env_type']} not in {numerical_env_alias_dict.keys()}"
-        env = create_numerical_optimization_env(env_cfg, **env_kwargs)
-        if norm_act:
-            env = RescaleAction(env, min_action, max_action)
-        if monitor:
-            env = CostMonitor(env, filename=save_path)
-        return env
 
     if env_cfg.env_name in gym.envs.registry.keys():
         env_kwargs = dict(env_kwargs)
@@ -258,7 +246,6 @@ def instantiate_env(
         env = SafetyGymWrapper(env, 1, **env_kwargs)
         env = FlattenObservation(env)
     
-    # env.seed(seed)
     if norm_act:
         env = RescaleAction(env, min_action, max_action)
     if monitor:

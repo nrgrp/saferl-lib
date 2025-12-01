@@ -26,16 +26,14 @@ class SafetyGymWrapper(gym.Wrapper):
         self.incl_cost_in_reward = env_kwargs.get("incl_cost_in_reward", False)
 
     def step(self, action):
-        observation, reward, cost, terminated, truncated, info = self.env.step(action)
-        # observation, reward, done, info = self.env.step(action)
-        # info["cost"] = [1.0] if info["cost"] > 0 else [0.0]
-        
-        # info["cost"] = [info["cost"]]
-        # info["state_safe"] = True if np.sum(info["cost"]) <= 0 else False
-        if self.cost_dim == 1:
-            cost = [cost]
-        info["cost"] = cost
-        info["state_safe"] = True if np.sum(cost) <= 0 else False
+        env_step = self.env.step(action)
+        if len(env_step) == 6:
+            observation, reward, cost, terminated, truncated, info = env_step
+            info["cost"] = [cost]
+        else:
+            observation, reward, terminated, truncated, info = env_step
+            info["cost"] = [info["cost"]]
+        info["state_safe"] = True if np.sum(info["cost"]) <= 0 else False
         if self.incl_cost_in_reward:
             reward -= np.sum(info["cost"])
         return observation, reward, terminated, truncated, info
