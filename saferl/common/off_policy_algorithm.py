@@ -659,8 +659,17 @@ class SafeOffPolicyAlgorithm(BaseAlgorithm):
                     # Update stats
                     num_collected_episodes += 1
                     self._episode_num += 1
-                    if np.sum(infos[idx]['cost']) <= 0: 
-                        self._safe_episode_num += 1 
+
+                    # Count "safe" episodes based on cumulative episode cost (logged by CostMonitor)
+                    # Fallback to per-step cost if episode summary is unavailable.
+                    ep_info = infos[idx].get("episode")
+                    if ep_info is not None and "cost" in ep_info:
+                        ep_cost = ep_info["cost"]
+                    else:
+                        ep_cost = infos[idx]["cost"]
+
+                    if np.sum(ep_cost) <= 0:
+                        self._safe_episode_num += 1
                     if infos[idx].get("success", False):
                         self._success_episodes_num += 1
                     if action_noise is not None:
